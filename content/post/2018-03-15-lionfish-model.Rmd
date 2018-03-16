@@ -1,0 +1,92 @@
+---
+title: Lionfish model
+author: Bruce Kendall
+date: '2018-03-15'
+slug: lionfish-model
+categories:
+  - Science
+tags:
+  - bad matrix models
+---
+
+Here is a quick analysis of the lionfish model.
+
+First the underlying parameters:
+```{r}
+# Instantaneous mortality rates
+ML <- 0.35
+MA <- 0.052
+MJ <- 0.165
+ME <- 0.31
+
+# Stage durations
+DL <- 30
+DE <- 3
+
+# Fecundity
+f <- 194577 # Egg production
+rho <- 0.46 # Sex ratio
+```
+Now make monthly survivals and fecundity:
+```{r}
+sigmaA <- exp(-MA)
+sigmaJ <- exp(-MJ)
+sigmaL <- exp(-ML*DL)
+FA <- rho * f * exp(-ME*DE)
+```
+# Naive model
+The model in the paper has:
+
+- no survival in the reproduction transition;
+- no reproduction by maturing individuals
+- fraction maturing is $1/T$:
+
+```{r}
+class_names <- c("Larval","Juvenile","Adult")
+
+Anaive <- matrix(c(0,0,FA,
+              sigmaL,sigmaJ*11/12,0,
+              0,sigmaJ/12,sigmaA),
+            nrow = 3, ncol = 3, byrow = TRUE, dimnames = list(class_names, class_names))
+```
+
+# "True" model
+Correct all of these errors. Note that in the paper, maturation is stated to be at one year, but in fact with one moth larval and 12 months juvenile it actually works out to 13 months. Here it is for one year:
+```{r}
+Atrue <- matrix(0, 13, 13)
+diag(Atrue[-1,-13]) <- c(sigmaL, rep(sigmaJ, 11))
+Atrue[13,13] <- sigmaA
+Atrue[1,12:13] <- FA * c(sigmaJ,sigmaA)
+```
+And here it is with 12 months of juveniles:
+```{r}
+Atrue12 <- matrix(0, 14, 14)
+diag(Atrue12[-1,-14]) <- c(sigmaL, rep(sigmaJ, 12))
+Atrue12[14,14] <- sigmaA
+Atrue12[1,13:14] <- FA * c(sigmaJ,sigmaA)
+```
+
+# Compare lambdas
+```{r}
+library(primer)
+DemoInfo(Anaive)$lambda
+DemoInfo(Atrue)$lambda
+DemoInfo(Atrue12)$lambda
+```
+So a huge difference in the population growth rate!
+
+# Contributions to the errors
+```{r}
+A12latemature <- Atrue12
+A12latemature[1,13] <-0
+DemoInfo(A12latemature)$lambda
+
+A12nosurv <- Atrue12
+A12nosurv[1,13:14] <- FA
+DemoInfo(A12nosurv)$lambda
+
+Abadgrow <- Anaive
+Abadgrow[1,2:3]<- FA * c(sigmaJ/12,sigmaA)
+DemoInfo(Abadgrow)$lambda
+```
+From this we see that the effects of missing survival in F and of missing reproduction by maturing individuals is small (and in opposite directions). This is probably due to the high adult survival, such that the multiplier is only a little less than one, and most individuals have many opportunities to reproduce. The vast bulk of the effect is due to the incorrect maturation rate.

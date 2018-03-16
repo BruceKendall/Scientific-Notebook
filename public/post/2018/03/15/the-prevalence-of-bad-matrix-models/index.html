@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The prevalence of bad matrix models | A minimal Hugo website</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link href="//cdn.bootcss.com/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">The prevalence of bad matrix models</span></h1>
+<h2 class="author">Bruce Kendall</h2>
+<h2 class="date">2018/03/15</h2>
+<p class="terms">
+  
+  
+  Categories: <a href="/categories/science">Science</a> 
+  
+  
+  
+  Tags: <a href="/tags/bad-matrix-models">bad matrix models</a> 
+  
+  
+</p></div>
+
+<main>
+<p>My students in 211 have revealed that there are an astonishing number of animal population matrices still being published with fundamental errors, including no survival in the reproductive term, failing to hit first breeding in models with post-breeding censuses, and incorrect maturation fractions in stage-for-age models (basically, if stage duration is T, they say that the maturation fraction is <span class="math inline">\(1/T\)</span>). A quick analysis I did on the lionfish model shows that the latter has the biggest impact on <span class="math inline">\(\lambda\)</span> (1.14 vs 1.03). I would suspect that there are similarly sized impacts on other life history variables (generation time etc).</p>
+<p>I think I should write a short paper pointing this out and extracting the frequency of errors in comadre/compadre—-perhaps also looking at trends through time. The new special issue that Rob just circulated about would be a good venue. The paper might also need to explore the impacts of T, juvenile survival and lambda on the error associated with this error.</p>
+<p>To do this, I need to identify within the databases the studies that use post-breeding censuses and that use stage-structured models. For the former, I can look at the names of the first stage class (at least for animals; I’ll need to think some more about plants), in MatrixClassAuthor. There will be some cases that are still ambiguous, but a few months ago I looked at this and there were a lot of examples of “age0”, “neonate” etc.</p>
+<p>For the second, the variable “MatrixCriteriaOntogeny” might be a guideline.</p>
+<p>I’d then need to go to the actual papers to find out how the matrices were constructed from underlying data, (although for the maturation data I could do a first cut by looking at whether <span class="math inline">\(P_i\)</span> is an integer multiple of <span class="math inline">\(G_i\)</span>). This is the time consuming bit.</p>
+<p>I anticipate adding several variables to the database:</p>
+<ul>
+<li>Census type (pre, post, other)</li>
+<li>Survival included in reproductive transition (Yes, no, unclear)</li>
+<li>Stage4Age (yes, no; maybe list which stage classes; NA for size and age-only models)</li>
+<li>MaturationModel (1/T, Crowder, others?)</li>
+</ul>
+<p>The abstract is due by the end of the month. For that purpose, I think I need to do a preliminary count of post-breeding and stage structured models, and then look at a sample of them for frequencies. In my cover letter to Rob I’ll mention that the numbers will change as I make a more comprehensive list.</p>
+<p>Note that there is a rudimentary package on github at <code>jonesor/compadreDB/mage</code>. It includes a function for assembling a life table from a stage structured model that <em>assumes</em> that the maturation fraction is correct!</p>
+
+</main>
+
+  <footer>
+  <script src="//yihui.name/js/math-code.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<script async src="//yihui.name/js/center-img.js"></script>
+
+<script src="//cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.12.0/languages/r.min.js"></script>
+
+<script>
+hljs.configure({languages: []});
+hljs.initHighlightingOnLoad();
+</script>
+
+  
+  <hr/>
+  &copy; <a href="https://kendall.bren.ucsb.edu">Bruce Kendall</a> 2018 | <a href="https://github.com/brucekendall">Github</a> | <a href="https://twitter.com/bruceekendall">Twitter</a>
+  
+  </footer>
+  </body>
+</html>
+

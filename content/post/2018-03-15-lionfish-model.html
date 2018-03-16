@@ -1,0 +1,90 @@
+---
+title: Lionfish model
+author: Bruce Kendall
+date: '2018-03-15'
+slug: lionfish-model
+categories:
+  - Science
+tags:
+  - bad matrix models
+---
+
+
+
+<p>Here is a quick analysis of the lionfish model.</p>
+<p>First the underlying parameters:</p>
+<pre class="r"><code># Instantaneous mortality rates
+ML &lt;- 0.35
+MA &lt;- 0.052
+MJ &lt;- 0.165
+ME &lt;- 0.31
+
+# Stage durations
+DL &lt;- 30
+DE &lt;- 3
+
+# Fecundity
+f &lt;- 194577 # Egg production
+rho &lt;- 0.46 # Sex ratio</code></pre>
+<p>Now make monthly survivals and fecundity:</p>
+<pre class="r"><code>sigmaA &lt;- exp(-MA)
+sigmaJ &lt;- exp(-MJ)
+sigmaL &lt;- exp(-ML*DL)
+FA &lt;- rho * f * exp(-ME*DE)</code></pre>
+<div id="naive-model" class="section level1">
+<h1>Naive model</h1>
+<p>The model in the paper has:</p>
+<ul>
+<li>no survival in the reproduction transition;</li>
+<li>no reproduction by maturing individuals</li>
+<li>fraction maturing is <span class="math inline">\(1/T\)</span>:</li>
+</ul>
+<pre class="r"><code>class_names &lt;- c(&quot;Larval&quot;,&quot;Juvenile&quot;,&quot;Adult&quot;)
+
+Anaive &lt;- matrix(c(0,0,FA,
+              sigmaL,sigmaJ*11/12,0,
+              0,sigmaJ/12,sigmaA),
+            nrow = 3, ncol = 3, byrow = TRUE, dimnames = list(class_names, class_names))</code></pre>
+</div>
+<div id="true-model" class="section level1">
+<h1>“True” model</h1>
+<p>Correct all of these errors. Note that in the paper, maturation is stated to be at one year, but in fact with one moth larval and 12 months juvenile it actually works out to 13 months. Here it is for one year:</p>
+<pre class="r"><code>Atrue &lt;- matrix(0, 13, 13)
+diag(Atrue[-1,-13]) &lt;- c(sigmaL, rep(sigmaJ, 11))
+Atrue[13,13] &lt;- sigmaA
+Atrue[1,12:13] &lt;- FA * c(sigmaJ,sigmaA)</code></pre>
+<p>And here it is with 12 months of juveniles:</p>
+<pre class="r"><code>Atrue12 &lt;- matrix(0, 14, 14)
+diag(Atrue12[-1,-14]) &lt;- c(sigmaL, rep(sigmaJ, 12))
+Atrue12[14,14] &lt;- sigmaA
+Atrue12[1,13:14] &lt;- FA * c(sigmaJ,sigmaA)</code></pre>
+</div>
+<div id="compare-lambdas" class="section level1">
+<h1>Compare lambdas</h1>
+<pre class="r"><code>library(primer)</code></pre>
+<pre><code>## Loading required package: deSolve</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre class="r"><code>DemoInfo(Anaive)$lambda</code></pre>
+<pre><code>## [1] 1.124972</code></pre>
+<pre class="r"><code>DemoInfo(Atrue)$lambda</code></pre>
+<pre><code>## [1] 1.045942</code></pre>
+<pre class="r"><code>DemoInfo(Atrue12)$lambda</code></pre>
+<pre><code>## [1] 1.036576</code></pre>
+<p>So a huge difference in the population growth rate!</p>
+</div>
+<div id="contributions-to-the-errors" class="section level1">
+<h1>Contributions to the errors</h1>
+<pre class="r"><code>A12latemature &lt;- Atrue12
+A12latemature[1,13] &lt;-0
+DemoInfo(A12latemature)$lambda</code></pre>
+<pre><code>## [1] 1.032953</code></pre>
+<pre class="r"><code>A12nosurv &lt;- Atrue12
+A12nosurv[1,13:14] &lt;- FA
+DemoInfo(A12nosurv)$lambda</code></pre>
+<pre><code>## [1] 1.039302</code></pre>
+<pre class="r"><code>Abadgrow &lt;- Anaive
+Abadgrow[1,2:3]&lt;- FA * c(sigmaJ/12,sigmaA)
+DemoInfo(Abadgrow)$lambda</code></pre>
+<pre><code>## [1] 1.139171</code></pre>
+<p>From this we see that the effects of missing survival in F and of missing reproduction by maturing individuals is small (and in opposite directions). This is probably due to the high adult survival, such that the multiplier is only a little less than one, and most individuals have many opportunities to reproduce. The vast bulk of the effect is due to the incorrect maturation rate.</p>
+</div>
