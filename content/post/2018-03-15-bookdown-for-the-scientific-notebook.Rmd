@@ -1,0 +1,15 @@
+---
+title: Bookdown for the scientific notebook
+author: Bruce Kendall
+date: '2018-03-15'
+slug: bookdown-for-the-scientific-notebook
+categories:
+  - Computing
+tags:
+  - workflow
+---
+
+I'm launching a new scientific notebook using blogdown, following the install instructions at https://bookdown.org/yihui/blogdown/workflow.html and using Yihui's Xmin theme. I modified some stuff in `layouts/` to get syntax highlighting and to show tags and categories.
+
+The example posts are still there for now, though I can safely delete them as they can be found elsewhere.
+
