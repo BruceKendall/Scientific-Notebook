@@ -13,3 +13,5 @@ I'm launching a new scientific notebook using blogdown, following the install in
 
 The example posts are still there for now, though I can safely delete them as they can be found elsewhere.
 
+I've set up a netifly account to automagically build the site, and serve it at brucekendall.netifly.com.
+
