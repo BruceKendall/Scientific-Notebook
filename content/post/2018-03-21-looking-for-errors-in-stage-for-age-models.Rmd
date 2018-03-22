@@ -1,0 +1,26 @@
+---
+title: Looking for errors in stage-for-age models
+author: Bruce Kendall
+date: '2018-03-21'
+slug: looking-for-errors-in-stage-for-age-models
+categories:
+  - Science
+tags:
+  - bad matrix models
+---
+
+I've started in on an R project for documenting more info about comadre/compadre models---it's in a repository called "compadre-plus." On Sunday I did some of the data munging, especially wrt identifying post-breeding census models. In particular I classified as many animal models as I could based on the name of the first stage.
+
+Now I'm looking at the stage-for-age errors. The search term is `MatrixCriteriaOntogeny %in% c("Based on age", "Yes")`. I tried using the **fulltext** package to download pdfs, but its hit rate is low: out of 55 papers since 2010 that met this criterion, it only managed to download 12. But that's enough for a preliminary analysis.
+
+What I'm discovering is that in many cases it's hard to tell exactly what they've done. In cases where they don't explicitly give the formula, I'll actually need to get the stage durations and then calculate the standard approaches to see what matches the actual model. Here are the formulas, although I'll need to check in Caswell to make sure I've got the "correct" version right.
+
+Let $\sigma_i$ be annual survival in stage $i$, and $\gamma_i$ be the fraction the mature (conditional on survival). $T_i$ is the stage duration. Then we have:
+
+- **Flat age structure:** $\gamma_i = 1/T_i$; assumes all age classes within the stage are equally abundant.
+- **Cohort age structure:** $\gamma_i = \frac{\sigma_i^{T_i-1}}{\sum_{x=0}^{T_i-1} \sigma_i^x}$; assumes $\lambda = 1$.
+- **Asymptotic age structure:** $\gamma_i = \frac{(\sigma_i/\lambda)^{T_i-1}}{\sum_{x=0}^{T_i-1} (\sigma_i/\lambda)^x}$; assumes population at asymptotic age structure.
+
+The latter two can only be calculated if $T_i$ is an integer; at least one paper I've found has non-integer values, so I'll have to look to Caswell to see if he treats that somehow. The formula in Crowder et al. (1994) doesn't make sense (I think its brackets are in the wrong place); although it doesn't include a sum, I think it is based on the solution of $\sum r^x$, so while one could put in a noninteger value that would be a corruption of the derivation.
+
+So I've downloaded teh rest of the post-2010 papers, and gone through some of them. Not all of them have stage-for-age (pulled up with "Yes," I guess). And in many cases it's impossible to tell what's going on. I did find one case where the original publication was correct with a pre-breeding census, and the comadre team translated it into a post-breeding census (presumably so they don't have to deal with a 1x1 meatrix), but did the F matrix incorrectly. I also found some errors in dois.
